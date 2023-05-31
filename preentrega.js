@@ -1,4 +1,4 @@
-//STOCK DE PRODUCTOS
+// STOCK DE PRODUCTOS
 const Stock = [
   {
     producto: "Jamon Cocido",
@@ -78,106 +78,101 @@ const Stock = [
     cantidad: 90,
   },
 ];
+
 let pedidos = [];
 
 // Mostramos diferentes opciones de los productos y su disponibilidad
 let opcion;
-while (opcion !== "Salir") {
+while (opcion !== "4") {
   opcion = prompt(
-    "Escriba Stock para ver los productos \n Escriba comprar si desea hacer una compra \n Escriba Ver para visualizar su carrito de compras \n Escriba Salir si deseas salir para cerrar"
+    "Elija una opción:\n 1. Ver Stock\n 2. Comprar\n 3. Ver Carrito\n 4. Salir\n 5. Ver Oferta de la Semana"
   );
-  if (opcion === "Stock") {
-    mostrarListado();
-  } else if (opcion === "comprar") {
-    solicitarDatos();
-  } else if (opcion === "Ver") {
-    mostrarCarrito();
+
+  mostrarOfertaSemana(); // Llamada a la función que muestra la oferta de la semana
+
+  if (opcion === "1") {
+    mostrarStock(); // Llamada a la función que muestra el stock
+  } else if (opcion === "2") {
+    solicitarCompra(); // Llamada a la función que solicita la compra
+  } else if (opcion === "3") {
+    mostrarCarrito(); // Llamada a la función que muestra el carrito de compras
   }
 }
 
 /**
- * Muestra la lista de productos disponibles en stock
+ * Muestra el stock actual de productos disponibles
  */
-function mostrarListado() {
+function mostrarStock() {
   for (let i = 0; i < Stock.length; i++) {
     alert(
-      `${Stock[i].producto} \n Precio Por Unidad : ${Stock[i].precio_unidad} \n Precio Por Caja : ${Stock[i].precio_por_caja} \n Cantidad Disponible : ${Stock[i].cantidad}`
+      `${Stock[i].producto}\nPrecio Por Unidad: ${Stock[i].precio_unidad}\nPrecio Por Caja: ${Stock[i].precio_por_caja}\nCantidad Disponible: ${Stock[i].cantidad}`
     );
   }
 }
 
 /**
- * Solicita datos al usuario para realizar una compra
+ * Solicita los datos al usuario para realizar una compra
  */
-// Solicitud de datos
-function solicitarDatos() {
-  let producto = prompt("Ingrese el nombre del producto buscado");
+function solicitarCompra() {
+  let producto = prompt("Ingrese el nombre del producto que desea comprar:");
+  let cantidad = parseInt(prompt("Ingrese la cantidad deseada:"));
+
   let productoEncontrado = Stock.find(
     (item) => item.producto.toLowerCase() === producto.toLowerCase()
-  );
-  let costoTotal = 0;
-  if (productoEncontrado) {
-    let tipo = prompt("Quiere Caja o Unidad");
-    let cantidad = prompt("Ingrese la cantidad");
-    switch (tipo) {
-      case "unidad":
-        if (cantidad <= productoEncontrado.cantidad) {
-          costoTotal = cantidad * productoEncontrado.precio_unidad;
-        } else {
-          alert("No contamos con el stock suficiente");
-          return;
-        }
-        break;
-      case "caja":
-        if (cantidad <= productoEncontrado.cantidad) {
-          costoTotal = cantidad * productoEncontrado.precio_por_caja;
-        } else {
-          alert("No contamos con el stock suficiente");
-          return;
-        }
-        break;
-      default:
-        alert("Opción inválida");
-        return;
-    }
-    let pedido = {
-      producto: productoEncontrado.producto,
-      cantidad: cantidad,
-      tipo: tipo,
-      precioTotal: costoTotal,
-    };
-    pedidos.push(pedido);
-    actualizarLista(productoEncontrado, cantidad);
+  ); // Búsqueda del producto en el array Stock
 
-    // Muestra un mensaje de agradecimiento al usuario aun no pude corregirlo pero
-    alert("Gracias por su compra!");
+  if (productoEncontrado) {
+    if (productoEncontrado.cantidad >= cantidad) {
+      let subtotal;
+      if (cantidad >= 10) {
+        subtotal = productoEncontrado.precio_por_caja * cantidad;
+      } else {
+        subtotal = productoEncontrado.precio_unidad * cantidad;
+      }
+      let pedido = {
+        producto: productoEncontrado.producto,
+        cantidad: cantidad,
+        subtotal: subtotal,
+      };
+      pedidos.push(pedido); // Agregar pedido al array pedidos
+      productoEncontrado.cantidad -= cantidad; // Actualizar la cantidad disponible del producto
+      alert("¡Compra realizada con éxito!");
+    } else {
+      alert("No hay suficiente stock disponible");
+    }
   } else {
-    alert("No tenemos ese producto");
+    alert("El producto ingresado no existe en el stock");
   }
 }
 
 /**
- * Muestra el carrito de la lista de pedidos
+ * Muestra el contenido del carrito de compras
  */
 function mostrarCarrito() {
   if (pedidos.length === 0) {
-    alert("Aún no has comprado nada");
+    alert("El carrito de compras está vacío");
   } else {
-    for (let i = 0; i < pedidos.length; i++) {
-      alert(
-        `Tienes el pedido de: \n ${pedidos[i].producto} - Cantidad: ${pedidos[i].cantidad} - Total: ${pedidos[i].precioTotal}`
-      );
-    }
+    let carritoString = pedidos
+      .map(
+        (pedido) =>
+          `Producto: ${pedido.producto}\nCantidad: ${pedido.cantidad}\nSubtotal: ${pedido.subtotal}`
+      )
+      .join("\n\n");
+    alert("Carrito de Compras:\n\n" + carritoString);
   }
 }
 
 /**
- * Actualiza las cantidades en stock según corresponda
+ * Muestra la oferta de la semana (producto con el precio más bajo)
  */
-function actualizarLista(productoEncontrado, cantidad) {
-  for (let i = 0; i < Stock.length; i++) {
-    if (Stock[i].producto === productoEncontrado.producto) {
-      Stock[i].cantidad -= cantidad;
-    }
+function mostrarOfertaSemana() {
+  if (opcion === "5") {
+    const productoMasBarato = Stock.reduce((min, current) => {
+      return current.precio_unidad < min.precio_unidad ? current : min;
+    });
+
+    alert(
+      `¡Oferta de la Semana!\nProducto: ${productoMasBarato.producto}\nPrecio: ${productoMasBarato.precio_unidad}`
+    );
   }
 }
