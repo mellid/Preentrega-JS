@@ -149,7 +149,7 @@ function solicitarDatos() {
     pedidos.push(pedido);
     actualizarLista(productoEncontrado, cantidad);
 
-    // Muestra un mensaje de agradecimiento al usuario
+    // Muestra un mensaje de agradecimiento al usuario aun no pude corregirlo pero
     alert("Gracias por su compra!");
   } else {
     alert("No tenemos ese producto");
